@@ -33,6 +33,7 @@ public class Main {
 		day9();
 		day10part1();
 		day10part2();
+		day11();
 	}
 
 	private static void day1() throws IOException {
@@ -555,5 +556,61 @@ public class Main {
 		String result = denseHash.stream().map(p -> String.format("%02x", p)).collect(Collectors.joining());
 
 		System.out.println(result);
+	}
+
+	private static void day11() throws IOException {
+		System.out.println("===== DAY 11 =====");
+
+		List<String> input = new ArrayList<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day11.txt"))) {
+			String line = br.readLine();
+			for (String dir : line.split(",")) {
+				input.add(dir);
+			}
+		}
+
+		int x = 0;
+		int y = 0;
+		int steps = 0;
+		int mostSteps = 0;
+
+		for (String dir : input) {
+			switch (dir) {
+			case "n":
+				y += 2;
+				break;
+			case "ne":
+				y++;
+				x++;
+				break;
+			case "nw":
+				y++;
+				x--;
+				break;
+			case "s":
+				y -= 2;
+				break;
+			case "se":
+				y--;
+				x++;
+				break;
+			case "sw":
+				y--;
+				x--;
+				break;
+			}
+
+			int xAbs = Math.abs(x);
+			int yAbs = Math.abs(y);
+
+			steps = xAbs + (yAbs - xAbs) / 2;
+
+			if (steps > mostSteps) {
+				mostSteps = steps;
+			}
+		}
+
+		System.out.println("steps=" + steps + " mostSteps=" + mostSteps);
 	}
 }
