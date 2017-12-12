@@ -34,6 +34,7 @@ public class Main {
 		day10part1();
 		day10part2();
 		day11();
+		day12();
 	}
 
 	private static void day1() throws IOException {
@@ -612,5 +613,52 @@ public class Main {
 		}
 
 		System.out.println("steps=" + steps + " mostSteps=" + mostSteps);
+	}
+
+	private static void day12() throws IOException {
+		System.out.println("===== DAY 12 =====");
+
+		Map<Integer, Set<Integer>> input = new HashMap<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day12.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				Integer num = Integer.parseInt(line.substring(0, line.indexOf(" ")));
+				Set<Integer> links = new HashSet<>();
+				for (String s : line.substring(line.indexOf("<->") + 4).split(", ")) {
+					links.add(Integer.parseInt(s));
+				}
+				links.removeIf(l -> l.equals(num));
+				input.put(num, links);
+			}
+		}
+
+		Set<Integer> connected = new HashSet<>();
+		connected.add(0);
+
+		findConnected(0, input, connected, new HashSet<>());
+
+		int nbLinkTo0 = connected.size();
+		int nbGroups = 1;
+
+		for (int num : input.keySet()) {
+			if (!connected.contains(num)) {
+				findConnected(num, input, connected, new HashSet<>());
+				nbGroups++;
+			}
+		}
+
+		System.out.println("nbLinkTo0=" + nbLinkTo0 + " nbGroups=" + nbGroups);
+	}
+
+	private static void findConnected(int num, Map<Integer, Set<Integer>> input, Set<Integer> connected,
+			Set<Integer> processed) {
+		for (int link : input.get(num)) {
+			if (!processed.contains(link)) {
+				processed.add(link);
+				connected.add(link);
+				findConnected(link, input, connected, processed);
+			}
+		}
 	}
 }
