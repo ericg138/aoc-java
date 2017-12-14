@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import ericgf13.adventofcode.bean.Condition;
 import ericgf13.adventofcode.bean.Disk;
 import ericgf13.adventofcode.bean.Instruction;
+import ericgf13.adventofcode.bean.Layer;
 
 public class Main {
 
@@ -35,6 +36,7 @@ public class Main {
 		day10part2();
 		day11();
 		day12();
+		day13();
 	}
 
 	private static void day1() throws IOException {
@@ -660,5 +662,72 @@ public class Main {
 				findConnected(link, input, connected, processed);
 			}
 		}
+	}
+
+	private static void day13() throws IOException {
+		System.out.println("===== DAY 13 =====");
+
+		Map<Integer, Layer> layers = new HashMap<>();
+		int maxDepth = 0;
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day13.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				int depth = Integer.parseInt(line.substring(0, line.indexOf(":")));
+				int range = Integer.parseInt(line.substring(line.indexOf(":") + 2));
+				layers.put(depth, new Layer(range));
+				maxDepth = depth;
+			}
+		}
+
+		int severity = 0;
+		
+		int delay = -1;
+		boolean found = false;
+		
+		delay_loop:
+		while (!found) {
+			delay++;
+			System.out.println(delay);
+			for (Layer layer : layers.values()) {
+				layer.reset(delay);
+			}
+			
+			int currDepth = -1;
+			
+			while (currDepth < maxDepth) {
+				Layer nextLayer = layers.get(++currDepth);
+	
+				if (nextLayer != null) {
+					if (nextLayer.getScannerPos() == 0) {
+						continue delay_loop;
+					}
+				}
+	
+				for (Layer layer : layers.values()) {
+					layer.moveScanner();
+				}
+			}
+			
+			found = true;
+		}
+
+//		while (currDepth < maxDepth) {
+//			Layer nextLayer = layers.get(++currDepth);
+//
+//			if (nextLayer != null) {
+//				if (nextLayer.getScannerPos() == 0) {
+//					severity += nextLayer.getRange() * currDepth;
+//				}
+//			}
+//
+//			for (Layer layer : layers.values()) {
+//				layer.moveScanner();
+//			}
+//		}
+		
+		
+
+		System.out.println(severity + " " + delay);
 	}
 }
