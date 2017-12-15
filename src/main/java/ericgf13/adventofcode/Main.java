@@ -3,26 +3,30 @@ package ericgf13.adventofcode;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 import ericgf13.adventofcode.bean.Condition;
 import ericgf13.adventofcode.bean.Disk;
 import ericgf13.adventofcode.bean.Instruction;
-import ericgf13.adventofcode.bean.Layer;
 
 public class Main {
 
 	private static String INPUT_DIRECTORY = "src/main/resources/";
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		day1();
 		day2();
 		day3();
@@ -36,7 +40,10 @@ public class Main {
 		day10part2();
 		day11();
 		day12();
-		day13();
+		day13part1();
+		// day13part2();
+		day14();
+		day15();
 	}
 
 	private static void day1() throws IOException {
@@ -508,15 +515,16 @@ public class Main {
 	private static void day10part2() throws IOException {
 		System.out.println("===== DAY 10 Part 2 =====");
 
-		List<Integer> input = new ArrayList<>();
-
 		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day10.txt"))) {
-			String line = br.readLine();
-			for (char c : line.toCharArray()) {
-				input.add((int) c);
-			}
+			System.out.println(knotHash(br.readLine()));
 		}
+	}
 
+	private static String knotHash(String inputString) {
+		List<Integer> input = new ArrayList<>();
+		for (char c : inputString.toCharArray()) {
+			input.add((int) c);
+		}
 		input.addAll(Arrays.asList(17, 31, 73, 47, 23));
 
 		List<Integer> list = new ArrayList<>();
@@ -547,7 +555,6 @@ public class Main {
 		}
 
 		List<Integer> denseHash = new ArrayList<>();
-
 		for (int i = 0; i < 16; i++) {
 			int hash = 0;
 			for (int y = i * 16; y < (i + 1) * 16; y++) {
@@ -556,9 +563,7 @@ public class Main {
 			denseHash.add(hash);
 		}
 
-		String result = denseHash.stream().map(p -> String.format("%02x", p)).collect(Collectors.joining());
-
-		System.out.println(result);
+		return denseHash.stream().map(p -> String.format("%02x", p)).collect(Collectors.joining());
 	}
 
 	private static void day11() throws IOException {
@@ -664,70 +669,145 @@ public class Main {
 		}
 	}
 
-	private static void day13() throws IOException {
-		System.out.println("===== DAY 13 =====");
+	private static void day13part1() throws IOException {
+		System.out.println("===== DAY 13 Part 1 =====");
 
-		Map<Integer, Layer> layers = new HashMap<>();
-		int maxDepth = 0;
+		Map<Integer, Integer> layers = new LinkedHashMap<>();
 
 		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day13.txt"))) {
 			String line;
 			while ((line = br.readLine()) != null) {
 				int depth = Integer.parseInt(line.substring(0, line.indexOf(":")));
 				int range = Integer.parseInt(line.substring(line.indexOf(":") + 2));
-				layers.put(depth, new Layer(range));
-				maxDepth = depth;
+				layers.put(depth, range);
 			}
 		}
 
 		int severity = 0;
-		
-		int delay = -1;
-		boolean found = false;
-		
-		delay_loop:
-		while (!found) {
-			delay++;
-			System.out.println(delay);
-			for (Layer layer : layers.values()) {
-				layer.reset(delay);
+
+		for (Entry<Integer, Integer> entry : layers.entrySet()) {
+			if (moveScanner(entry.getKey(), entry.getValue()) == 0) {
+				severity += entry.getValue() * entry.getKey();
 			}
-			
-			int currDepth = -1;
-			
-			while (currDepth < maxDepth) {
-				Layer nextLayer = layers.get(++currDepth);
-	
-				if (nextLayer != null) {
-					if (nextLayer.getScannerPos() == 0) {
-						continue delay_loop;
-					}
-				}
-	
-				for (Layer layer : layers.values()) {
-					layer.moveScanner();
-				}
-			}
-			
-			found = true;
 		}
 
-//		while (currDepth < maxDepth) {
-//			Layer nextLayer = layers.get(++currDepth);
-//
-//			if (nextLayer != null) {
-//				if (nextLayer.getScannerPos() == 0) {
-//					severity += nextLayer.getRange() * currDepth;
-//				}
-//			}
-//
-//			for (Layer layer : layers.values()) {
-//				layer.moveScanner();
-//			}
-//		}
-		
-		
+		System.out.println(severity);
+	}
 
-		System.out.println(severity + " " + delay);
+	@SuppressWarnings("unused")
+	private static void day13part2() throws IOException {
+		System.out.println("===== DAY 13 Part 2 =====");
+
+		Map<Integer, Integer> layers = new LinkedHashMap<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day13.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				int depth = Integer.parseInt(line.substring(0, line.indexOf(":")));
+				int range = Integer.parseInt(line.substring(line.indexOf(":") + 2));
+				layers.put(depth, range);
+			}
+		}
+
+		int delay = -1;
+
+		delay_loop: while (true) {
+			delay++;
+			for (Entry<Integer, Integer> entry : layers.entrySet()) {
+				if (moveScanner(entry.getKey() + delay, entry.getValue()) == 0) {
+					continue delay_loop;
+				}
+			}
+			break;
+		}
+
+		System.out.println(delay);
+	}
+
+	private static int moveScanner(Integer delay, Integer range) {
+		// TODO optimize this shit
+		int pos = 0;
+		boolean down = true;
+		for (int i = 0; i < delay; i++) {
+			if (down) {
+				if (pos < range - 1) {
+					pos++;
+				} else {
+					pos--;
+					down = false;
+				}
+			} else {
+				if (pos > 0) {
+					pos--;
+				} else {
+					pos++;
+					down = true;
+				}
+			}
+		}
+		return pos;
+	}
+
+	private static void day14() {
+		System.out.println("===== DAY 14 =====");
+
+		String input = "hxtvlmkl";
+		List<String> list = new ArrayList<>();
+
+		for (int i = 0; i < 128; i++) {
+			list.add(input + "-" + i);
+		}
+
+		List<String> hashList = list.stream().map(p -> knotHash(p)).collect(Collectors.toList());
+		List<String> binaryHashList = hashList.stream().map(p -> new BigInteger(p, 16).toString(2))
+				.collect(Collectors.toList());
+
+		int squareCount = 0;
+		for (String binaryHash : binaryHashList) {
+			squareCount += binaryHash.replace("0", "").length();
+		}
+
+		System.out.println(squareCount);
+	}
+
+	private static void day15() throws InterruptedException {
+		System.out.println("===== DAY 15 =====");
+
+		long a = 679;
+		long b = 771;
+		int aFactor = 16807;
+		int bFactor = 48271;
+		int divisor = 2147483647;
+
+		int matchCount = 0;
+		for (int i = 0; i < 40_000_000; i++) {
+			a = (a * aFactor) % divisor;
+			b = (b * bFactor) % divisor;
+
+			if ((a & 0xFFFF) == (b & 0xFFFF)) {
+				matchCount++;
+			}
+		}
+
+		BlockingQueue<Long> queueA = new LinkedBlockingQueue<>();
+		BlockingQueue<Long> queueB = new LinkedBlockingQueue<>();
+
+		Generator generatorA = new Generator(679, aFactor, 4, queueA);
+		Generator generatorB = new Generator(771, bFactor, 8, queueB);
+
+		new Thread(generatorA).start();
+		new Thread(generatorB).start();
+
+		int matchCount2 = 0;
+		for (int i = 0; i < 5_000_000; i++) {
+			if ((queueA.take() & 0xFFFF) == (queueB.take() & 0xFFFF)) {
+				matchCount2++;
+			}
+		}
+
+		generatorA.shutDown();
+		generatorB.shutDown();
+
+		System.out.println("part1=" + matchCount + " part2=" + matchCount2);
 	}
 }
