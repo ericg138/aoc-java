@@ -41,9 +41,10 @@ public class Main {
 		day11();
 		day12();
 		day13part1();
-		// day13part2();
+		day13part2();
 		day14();
 		day15();
+		day16();
 	}
 
 	private static void day1() throws IOException {
@@ -694,7 +695,6 @@ public class Main {
 		System.out.println(severity);
 	}
 
-	@SuppressWarnings("unused")
 	private static void day13part2() throws IOException {
 		System.out.println("===== DAY 13 Part 2 =====");
 
@@ -709,7 +709,8 @@ public class Main {
 			}
 		}
 
-		int delay = -1;
+		// int delay = -1;
+		int delay = 3875830;
 
 		delay_loop: while (true) {
 			delay++;
@@ -725,7 +726,7 @@ public class Main {
 	}
 
 	private static int moveScanner(Integer delay, Integer range) {
-		// TODO optimize this shit
+		// TODO optimize
 		int pos = 0;
 		boolean down = true;
 		for (int i = 0; i < delay; i++) {
@@ -809,5 +810,67 @@ public class Main {
 		generatorB.shutDown();
 
 		System.out.println("part1=" + matchCount + " part2=" + matchCount2);
+	}
+
+	private static void day16() throws IOException {
+		System.out.println("===== DAY 16 =====");
+
+		List<String> input = new ArrayList<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day16.txt"))) {
+			input.addAll(Arrays.asList(br.readLine().split(",")));
+		}
+
+		List<String> programs = new ArrayList<>();
+		for (char c = 97; c < 113; c++) {
+			programs.add(String.valueOf(c));
+		}
+		String init = programs.stream().collect(Collectors.joining());
+
+		String firstPass = null;
+		int i = 0;
+		do {
+			i++;
+			dance(input, programs);
+			if (firstPass == null) {
+				firstPass = programs.stream().collect(Collectors.joining());
+			}
+		} while (!programs.stream().collect(Collectors.joining()).equals(init));
+
+		for (int y = 0; y < 1_000_000_000 % i; y++) {
+			dance(input, programs);
+		}
+
+		System.out.println("part1=" + firstPass + " part2=" + programs.stream().collect(Collectors.joining()));
+	}
+
+	private static void dance(List<String> input, List<String> programs) {
+		for (String instruction : input) {
+			switch (instruction.charAt(0)) {
+			case 's':
+				int lengthToMove = Integer.parseInt(instruction.substring(1));
+				List<String> listToMove = new ArrayList<>(
+						programs.subList(programs.size() - lengthToMove, programs.size()));
+				programs.removeAll(listToMove);
+				programs.addAll(0, listToMove);
+				break;
+			case 'x':
+				int index1 = Integer.parseInt(instruction.substring(1, instruction.indexOf('/')));
+				int index2 = Integer.parseInt(instruction.substring(instruction.indexOf('/') + 1));
+				String prog1 = programs.get(index1);
+				String prog2 = programs.get(index2);
+				programs.set(index1, prog2);
+				programs.set(index2, prog1);
+				break;
+			case 'p':
+				prog1 = instruction.substring(1, instruction.indexOf('/'));
+				prog2 = instruction.substring(instruction.indexOf('/') + 1);
+				index1 = programs.indexOf(prog1);
+				index2 = programs.indexOf(prog2);
+				programs.set(index1, prog2);
+				programs.set(index2, prog1);
+				break;
+			}
+		}
 	}
 }
