@@ -45,6 +45,7 @@ public class Main {
 		day14();
 		day15();
 		day16();
+		day17();
 	}
 
 	private static void day1() throws IOException {
@@ -872,5 +873,24 @@ public class Main {
 				break;
 			}
 		}
+	}
+
+	private static void day17() throws IOException {
+		System.out.println("===== DAY 17 =====");
+
+		int steps = 343;
+
+		List<Integer> buffer = new ArrayList<>();
+		buffer.add(0);
+
+		int pos = 0;
+		int val = 0;
+
+		for (int i = 0; i < 2017; i++) {
+			pos = (pos + steps) % buffer.size() + 1;
+			buffer.add(pos, ++val);
+		}
+
+		System.out.println(buffer.get(pos + 1));
 	}
 }
