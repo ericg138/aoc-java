@@ -1,4 +1,4 @@
-package ericgf13.adventofcode;
+package ericgf13.adventofcode.runnable;
 
 import java.util.concurrent.BlockingQueue;
 

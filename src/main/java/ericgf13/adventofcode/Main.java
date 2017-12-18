@@ -16,11 +16,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 import ericgf13.adventofcode.bean.Condition;
 import ericgf13.adventofcode.bean.Disk;
 import ericgf13.adventofcode.bean.Instruction;
+import ericgf13.adventofcode.runnable.Generator;
+import ericgf13.adventofcode.runnable.Program;
 
 public class Main {
 
@@ -46,6 +51,8 @@ public class Main {
 		day15();
 		day16();
 		day17();
+		day18part1();
+		day18part2();
 	}
 
 	private static void day1() throws IOException {
@@ -688,7 +695,7 @@ public class Main {
 		int severity = 0;
 
 		for (Entry<Integer, Integer> entry : layers.entrySet()) {
-			if (moveScanner(entry.getKey(), entry.getValue()) == 0) {
+			if (isScannerPos0(entry.getKey(), entry.getValue())) {
 				severity += entry.getValue() * entry.getKey();
 			}
 		}
@@ -710,13 +717,12 @@ public class Main {
 			}
 		}
 
-		// int delay = -1;
-		int delay = 3875830;
+		int delay = 0;
 
 		delay_loop: while (true) {
 			delay++;
 			for (Entry<Integer, Integer> entry : layers.entrySet()) {
-				if (moveScanner(entry.getKey() + delay, entry.getValue()) == 0) {
+				if (isScannerPos0(entry.getKey() + delay, entry.getValue())) {
 					continue delay_loop;
 				}
 			}
@@ -726,28 +732,8 @@ public class Main {
 		System.out.println(delay);
 	}
 
-	private static int moveScanner(Integer delay, Integer range) {
-		// TODO optimize
-		int pos = 0;
-		boolean down = true;
-		for (int i = 0; i < delay; i++) {
-			if (down) {
-				if (pos < range - 1) {
-					pos++;
-				} else {
-					pos--;
-					down = false;
-				}
-			} else {
-				if (pos > 0) {
-					pos--;
-				} else {
-					pos++;
-					down = true;
-				}
-			}
-		}
-		return pos;
+	private static boolean isScannerPos0(Integer delay, Integer range) {
+		return delay % (range * 2 - 2) == 0;
 	}
 
 	private static void day14() {
@@ -875,7 +861,7 @@ public class Main {
 		}
 	}
 
-	private static void day17() throws IOException {
+	private static void day17() {
 		System.out.println("===== DAY 17 =====");
 
 		int steps = 343;
@@ -892,5 +878,109 @@ public class Main {
 		}
 
 		System.out.println(buffer.get(pos + 1));
+	}
+
+	private static void day18part1() throws IOException {
+		System.out.println("===== DAY 18 Part 1 =====");
+
+		List<String> instructions = new ArrayList<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day18.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				instructions.add(line);
+			}
+		}
+
+		Map<String, Long> values = new HashMap<>();
+		long lastSound = -1;
+
+		int i = 0;
+		loop: while (true) {
+			String instruction = instructions.get(i++);
+			String[] splitInstruction = instruction.split(" ");
+			String x = splitInstruction[1];
+			String y = splitInstruction.length > 2 ? splitInstruction[2] : null;
+
+			switch (splitInstruction[0]) {
+			case "snd":
+				lastSound = getValue(x, values);
+				break;
+			case "set":
+				values.put(x, getValue(y, values));
+				break;
+			case "add":
+				values.put(x, getValue(x, values) + getValue(y, values));
+				break;
+			case "mul":
+				values.put(x, getValue(x, values) * getValue(y, values));
+				break;
+			case "mod":
+				values.put(x, getValue(x, values) % getValue(y, values));
+				break;
+			case "rcv":
+				if (getValue(x, values) != 0) {
+					break loop;
+				}
+				break;
+			case "jgz":
+				if (getValue(x, values) > 0) {
+					i += getValue(y, values) - 1;
+				}
+				break;
+			}
+		}
+
+		System.out.println(lastSound);
+	}
+
+	private static void day18part2() throws IOException, InterruptedException {
+		System.out.println("===== DAY 18 Part 2 =====");
+
+		List<String> instructions = new ArrayList<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day18.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				instructions.add(line);
+			}
+		}
+
+		BlockingQueue<Long> queue0 = new LinkedBlockingQueue<>();
+		BlockingQueue<Long> queue1 = new LinkedBlockingQueue<>();
+
+		Program prog0 = new Program(0, instructions, queue0, queue1);
+		Program prog1 = new Program(1, instructions, queue1, queue0);
+
+		new Thread(prog0).start();
+		new Thread(prog1).start();
+
+		while (true) {
+			Thread.sleep(10);
+			boolean lock0 = prog0.getLock().tryLock(100, TimeUnit.MILLISECONDS);
+			boolean lock1 = prog1.getLock().tryLock(100, TimeUnit.MILLISECONDS);
+			if (!lock0 && !lock1) {
+				break;
+			}
+			if (lock0) {
+				prog0.getLock().unlock();
+			}
+			if (lock1) {
+				prog1.getLock().unlock();
+			}
+		}
+
+		queue0.put(Long.MAX_VALUE);
+		queue1.put(Long.MAX_VALUE);
+
+		System.out.println(prog1.getSendCount());
+	}
+
+	public static long getValue(String in, Map<String, Long> values) {
+		if (NumberUtils.isCreatable(in)) {
+			return Long.parseLong(in);
+		} else {
+			return values.get(in) != null ? values.get(in) : 0;
+		}
 	}
 }
