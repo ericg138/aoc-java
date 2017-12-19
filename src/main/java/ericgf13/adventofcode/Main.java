@@ -53,6 +53,7 @@ public class Main {
 		day17();
 		day18part1();
 		day18part2();
+		day19();
 	}
 
 	private static void day1() throws IOException {
@@ -982,5 +983,75 @@ public class Main {
 		} else {
 			return values.get(in) != null ? values.get(in) : 0;
 		}
+	}
+
+	private static void day19() throws IOException {
+		System.out.println("===== DAY 19 =====");
+
+		List<String> diagram = new ArrayList<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day19.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				diagram.add(line);
+			}
+		}
+
+		int x = diagram.get(0).indexOf('|');
+		int y = 0;
+		int steps = 0;
+		Direction dir = Direction.DOWN;
+		String letters = "";
+
+		char charac;
+		while ((charac = diagram.get(y).charAt(x)) != ' ') {
+			switch (charac) {
+			case '+':
+				if (dir == Direction.UP || dir == Direction.DOWN) {
+					if (diagram.get(y).charAt(x + 1) != ' ') {
+						dir = Direction.RIGHT;
+						x++;
+					} else if (diagram.get(y).charAt(x - 1) != ' ') {
+						dir = Direction.LEFT;
+						x--;
+					}
+				} else if (dir == Direction.RIGHT || dir == Direction.LEFT) {
+					if (diagram.get(y - 1).charAt(x) != ' ') {
+						dir = Direction.UP;
+						y--;
+					} else if (diagram.get(y + 1).charAt(x) != ' ') {
+						dir = Direction.DOWN;
+						y++;
+					}
+				}
+				break;
+			default:
+				switch (dir) {
+				case DOWN:
+					y++;
+					break;
+				case UP:
+					y--;
+					break;
+				case RIGHT:
+					x++;
+					break;
+				case LEFT:
+					x--;
+					break;
+				}
+				if (charac >= 'A' && charac <= 'Z') {
+					letters += charac;
+				}
+				break;
+			}
+			steps++;
+		}
+
+		System.out.println("letters=" + letters + " steps=" + steps);
+	}
+
+	private enum Direction {
+		UP, DOWN, RIGHT, LEFT
 	}
 }
