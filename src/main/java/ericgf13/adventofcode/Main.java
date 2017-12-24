@@ -27,6 +27,7 @@ import ericgf13.adventofcode.bean.Component;
 import ericgf13.adventofcode.bean.Condition;
 import ericgf13.adventofcode.bean.Disk;
 import ericgf13.adventofcode.bean.Instruction;
+import ericgf13.adventofcode.bean.Node;
 import ericgf13.adventofcode.runnable.Generator;
 import ericgf13.adventofcode.runnable.Program;
 
@@ -57,6 +58,8 @@ public class Main {
 		day18part1();
 		day18part2();
 		day19();
+		day22part1();
+		day22part2();
 		day23();
 		day24();
 	}
@@ -1058,6 +1061,201 @@ public class Main {
 
 	private enum Direction {
 		UP, DOWN, RIGHT, LEFT
+	}
+
+	private static void day22part1() throws IOException {
+		System.out.println("===== DAY 22 Part 1 =====");
+
+		Map<Node, Character> input = new HashMap<>();
+		int x = 0;
+		int y = 0;
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day22.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				x = 0;
+				for (char c : line.toCharArray()) {
+					input.put(new Node(x++, y), c);
+				}
+				y++;
+			}
+		}
+
+		x = x / 2;
+		y = y / 2;
+		Direction dir = Direction.UP;
+		int infections = 0;
+
+		for (int i = 0; i < 10_000; i++) {
+			Node currNode = new Node(x, y);
+			input.putIfAbsent(currNode, '.');
+
+			if (input.get(currNode) == '#') {
+				input.put(currNode, '.');
+
+				switch (dir) {
+				case UP:
+					x++;
+					dir = Direction.RIGHT;
+					break;
+				case DOWN:
+					x--;
+					dir = Direction.LEFT;
+					break;
+				case RIGHT:
+					y++;
+					dir = Direction.DOWN;
+					break;
+				case LEFT:
+					y--;
+					dir = Direction.UP;
+					break;
+				}
+			} else {
+				infections++;
+				input.put(currNode, '#');
+
+				switch (dir) {
+				case UP:
+					x--;
+					dir = Direction.LEFT;
+					break;
+				case DOWN:
+					x++;
+					dir = Direction.RIGHT;
+					break;
+				case RIGHT:
+					y--;
+					dir = Direction.UP;
+					break;
+				case LEFT:
+					y++;
+					dir = Direction.DOWN;
+					break;
+				}
+			}
+		}
+
+		System.out.println(infections);
+	}
+
+	private static void day22part2() throws IOException {
+		System.out.println("===== DAY 22 Part 2 =====");
+
+		Map<Node, Character> input = new HashMap<>();
+		int x = 0;
+		int y = 0;
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day22.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				x = 0;
+				for (char c : line.toCharArray()) {
+					input.put(new Node(x++, y), c);
+				}
+				y++;
+			}
+		}
+
+		x = x / 2;
+		y = y / 2;
+		Direction dir = Direction.UP;
+		int infections = 0;
+
+		for (int i = 0; i < 10_000_000; i++) {
+			Node currNode = new Node(x, y);
+			input.putIfAbsent(currNode, '.');
+
+			switch (input.get(currNode)) {
+			case '#':
+				input.put(currNode, 'F');
+
+				switch (dir) {
+				case UP:
+					x++;
+					dir = Direction.RIGHT;
+					break;
+				case DOWN:
+					x--;
+					dir = Direction.LEFT;
+					break;
+				case RIGHT:
+					y++;
+					dir = Direction.DOWN;
+					break;
+				case LEFT:
+					y--;
+					dir = Direction.UP;
+					break;
+				}
+				break;
+			case '.':
+				input.put(currNode, 'W');
+
+				switch (dir) {
+				case UP:
+					x--;
+					dir = Direction.LEFT;
+					break;
+				case DOWN:
+					x++;
+					dir = Direction.RIGHT;
+					break;
+				case RIGHT:
+					y--;
+					dir = Direction.UP;
+					break;
+				case LEFT:
+					y++;
+					dir = Direction.DOWN;
+					break;
+				}
+				break;
+			case 'W':
+				infections++;
+				input.put(currNode, '#');
+
+				switch (dir) {
+				case UP:
+					y--;
+					break;
+				case DOWN:
+					y++;
+					break;
+				case RIGHT:
+					x++;
+					break;
+				case LEFT:
+					x--;
+					break;
+				}
+				break;
+			case 'F':
+				input.put(currNode, '.');
+
+				switch (dir) {
+				case UP:
+					y++;
+					dir = Direction.DOWN;
+					break;
+				case DOWN:
+					y--;
+					dir = Direction.UP;
+					break;
+				case RIGHT:
+					x--;
+					dir = Direction.LEFT;
+					break;
+				case LEFT:
+					x++;
+					dir = Direction.RIGHT;
+					break;
+				}
+				break;
+			}
+		}
+
+		System.out.println(infections);
 	}
 
 	private static void day23() throws IOException {
