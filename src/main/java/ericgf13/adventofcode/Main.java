@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+import ericgf13.adventofcode.bean.Bridge;
+import ericgf13.adventofcode.bean.Component;
 import ericgf13.adventofcode.bean.Condition;
 import ericgf13.adventofcode.bean.Disk;
 import ericgf13.adventofcode.bean.Instruction;
@@ -54,6 +57,8 @@ public class Main {
 		day18part1();
 		day18part2();
 		day19();
+		day23();
+		day24();
 	}
 
 	private static void day1() throws IOException {
@@ -1053,5 +1058,107 @@ public class Main {
 
 	private enum Direction {
 		UP, DOWN, RIGHT, LEFT
+	}
+
+	private static void day23() throws IOException {
+		System.out.println("===== DAY 23 =====");
+
+		List<String> instructions = new ArrayList<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day23.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				instructions.add(line);
+			}
+		}
+
+		Map<String, Long> values = new HashMap<>();
+		// values.put("a", 1l);
+		int mulCount = 0;
+
+		int i = 0;
+		while (i < instructions.size()) {
+			String instruction = instructions.get(i++);
+			String[] splitInstruction = instruction.split(" ");
+			String x = splitInstruction[1];
+			String y = splitInstruction.length > 2 ? splitInstruction[2] : null;
+
+			switch (splitInstruction[0]) {
+			case "set":
+				values.put(x, getValue(y, values));
+				break;
+			case "sub":
+				values.put(x, getValue(x, values) - getValue(y, values));
+				break;
+			case "mul":
+				values.put(x, getValue(x, values) * getValue(y, values));
+				mulCount++;
+				break;
+			case "jnz":
+				if (getValue(x, values) != 0) {
+					i += getValue(y, values) - 1;
+				}
+				break;
+			}
+		}
+
+		System.out.println(mulCount);
+	}
+
+	private static void day24() throws IOException {
+		System.out.println("===== DAY 24 =====");
+
+		Set<Component> components = new HashSet<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day24.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				components.add(new Component(Integer.parseInt(line.substring(0, line.indexOf('/'))),
+						Integer.parseInt(line.substring(line.indexOf('/') + 1))));
+			}
+		}
+
+		Set<Bridge> bridges = new HashSet<>();
+
+		components.stream().filter(c -> c.getPort1() == 0 || c.getPort2() == 0).forEach(c -> {
+			Bridge b = new Bridge();
+			b.getComponents().add(c);
+			buildBridges(c.getOtherPort(0), components, b, bridges);
+		});
+
+		Set<Bridge> longestBridges = new HashSet<>();
+
+		int maxLength = 0;
+		for (Bridge b : bridges) {
+			if (b.getComponents().size() == maxLength) {
+				longestBridges.add(b);
+			} else if (b.getComponents().size() > maxLength) {
+				longestBridges.clear();
+				longestBridges.add(b);
+				maxLength = b.getComponents().size();
+			}
+		}
+
+		int maxStength = bridges.stream().max(Comparator.comparing(Bridge::getStrength)).get().getStrength();
+		int strengthLongest = longestBridges.stream().max(Comparator.comparing(Bridge::getStrength)).get()
+				.getStrength();
+
+		System.out.println("part1=" + maxStength + " part2=" + strengthLongest);
+	}
+
+	private static void buildBridges(int port, Set<Component> components, Bridge bridge, Set<Bridge> bridges) {
+		Set<Component> componentsCompatiblePort = components.stream()
+				.filter(c -> !bridge.getComponents().contains(c) && (c.getPort1() == port || c.getPort2() == port))
+				.collect(Collectors.toSet());
+
+		if (componentsCompatiblePort.isEmpty()) {
+			bridges.add(bridge);
+		} else {
+			for (Component c : componentsCompatiblePort) {
+				Bridge b = bridge.clone();
+				b.getComponents().add(c);
+				buildBridges(c.getOtherPort(port), components, b, bridges);
+			}
+		}
 	}
 }
