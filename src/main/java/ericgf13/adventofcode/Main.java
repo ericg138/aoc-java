@@ -28,6 +28,7 @@ import ericgf13.adventofcode.bean.Condition;
 import ericgf13.adventofcode.bean.Disk;
 import ericgf13.adventofcode.bean.Instruction;
 import ericgf13.adventofcode.bean.Node;
+import ericgf13.adventofcode.bean.StateInstruction;
 import ericgf13.adventofcode.runnable.Generator;
 import ericgf13.adventofcode.runnable.Program;
 
@@ -62,6 +63,7 @@ public class Main {
 		day22part2();
 		day23();
 		day24();
+		day25();
 	}
 
 	private static void day1() throws IOException {
@@ -1059,7 +1061,7 @@ public class Main {
 		System.out.println("letters=" + letters + " steps=" + steps);
 	}
 
-	private enum Direction {
+	public enum Direction {
 		UP, DOWN, RIGHT, LEFT
 	}
 
@@ -1358,5 +1360,66 @@ public class Main {
 				buildBridges(c.getOtherPort(port), components, b, bridges);
 			}
 		}
+	}
+
+	private static void day25() throws IOException {
+		System.out.println("===== DAY 25 =====");
+
+		Map<String, StateInstruction> stateInstructions = new HashMap<>();
+		int steps = 0;
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day25.txt"))) {
+			String line;
+			StateInstruction ins = null;
+			int val = 0;
+			while ((line = br.readLine()) != null) {
+				line = line.trim();
+
+				if (line.startsWith("Perform a diagnostic checksum after")) {
+					steps = Integer.parseInt(line.substring(36, line.indexOf(' ', 36)));
+				} else if (line.startsWith("In state")) {
+					ins = new StateInstruction();
+					stateInstructions.put(line.substring(9, 10), ins);
+				} else if (line.startsWith("If the current value is")) {
+					val = Integer.parseInt(line.substring(24, 25));
+				} else if (line.startsWith("- Write the value")) {
+					ins.setWriteVal(val, line.substring(18, 19));
+				} else if (line.startsWith("- Move one slot to the")) {
+					if (line.substring(23, 28).equals("right")) {
+						ins.setMoveDir(val, Direction.RIGHT);
+					} else {
+						ins.setMoveDir(val, Direction.LEFT);
+					}
+				} else if (line.startsWith("- Continue with state")) {
+					ins.setNextState(val, line.substring(22, 23));
+				}
+			}
+		}
+
+		int pos = 0;
+		List<Integer> tape = new ArrayList<>();
+		String state = "A";
+
+		for (int i = 0; i < steps; i++) {
+			if (pos < 0) {
+				tape.add(0, 0);
+				pos = 0;
+			} else if (pos >= tape.size()) {
+				tape.add(0);
+			}
+
+			StateInstruction ins = stateInstructions.get(state);
+			int currVal = tape.get(pos);
+
+			tape.set(pos, ins.getWriteVal(currVal));
+			if (ins.getMoveDir(currVal) == Direction.RIGHT) {
+				pos++;
+			} else {
+				pos--;
+			}
+			state = ins.getNextState(currVal);
+		}
+
+		System.out.println(tape.stream().filter(i -> i == 1).count());
 	}
 }
