@@ -28,6 +28,10 @@ import ericgf13.adventofcode.bean.Condition;
 import ericgf13.adventofcode.bean.Disk;
 import ericgf13.adventofcode.bean.Instruction;
 import ericgf13.adventofcode.bean.Node;
+import ericgf13.adventofcode.bean.Particle;
+import ericgf13.adventofcode.bean.ParticleAcceleration;
+import ericgf13.adventofcode.bean.ParticlePosition;
+import ericgf13.adventofcode.bean.ParticleVelocity;
 import ericgf13.adventofcode.bean.StateInstruction;
 import ericgf13.adventofcode.runnable.Generator;
 import ericgf13.adventofcode.runnable.Program;
@@ -59,6 +63,8 @@ public class Main {
 		day18part1();
 		day18part2();
 		day19();
+		day20part1();
+		day20part2();
 		day22part1();
 		day22part2();
 		day23();
@@ -1063,6 +1069,86 @@ public class Main {
 
 	public enum Direction {
 		UP, DOWN, RIGHT, LEFT
+	}
+
+	private static void day20part1() throws IOException {
+		System.out.println("===== DAY 20 Part 1 =====");
+
+		List<Particle> input = new ArrayList<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day20.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				input.add(createParticle(line));
+			}
+		}
+
+		for (int i = 0; i < 1000; i++) {
+			for (Particle p : input) {
+				p.changeVelocity();
+				p.changePosition();
+			}
+		}
+
+		long minDist = -1;
+		int indexMinDist = 0;
+		for (int i = 0; i < input.size(); i++) {
+			Particle p = input.get(i);
+			if (minDist == -1 || p.getManhattanDistance() < minDist) {
+				minDist = p.getManhattanDistance();
+				indexMinDist = i;
+			}
+		}
+
+		System.out.println(indexMinDist);
+	}
+
+	private static void day20part2() throws IOException {
+		System.out.println("===== DAY 20 Part 2 =====");
+
+		Set<Particle> input = new HashSet<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(INPUT_DIRECTORY + "day20.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				input.add(createParticle(line));
+			}
+		}
+
+		for (int i = 0; i < 40; i++) {
+			for (Particle p : input) {
+				p.changeVelocity();
+				p.changePosition();
+			}
+
+			Set<Particle> particlesToRemove = new HashSet<>();
+			for (Particle p : input) {
+				Set<Particle> particles = input.stream()
+						.filter(pa -> pa.getPosition().toString().equals(p.getPosition().toString()))
+						.collect(Collectors.toSet());
+
+				if (particles.size() > 1) {
+					particlesToRemove.addAll(particles);
+				}
+			}
+
+			input.removeAll(particlesToRemove);
+		}
+
+		System.out.println(input.size());
+	}
+
+	private static Particle createParticle(String line) {
+		int firstClosingBracket = line.indexOf('>');
+		int secondClosingBracket = line.indexOf('>', firstClosingBracket + 1);
+
+		ParticlePosition p = new ParticlePosition(line.substring(line.indexOf('<') + 1, firstClosingBracket));
+		ParticleVelocity v = new ParticleVelocity(
+				line.substring(line.indexOf('<', firstClosingBracket) + 1, secondClosingBracket));
+		ParticleAcceleration a = new ParticleAcceleration(
+				line.substring(line.indexOf('<', secondClosingBracket) + 1, line.length() - 1));
+
+		return new Particle(p, v, a);
 	}
 
 	private static void day22part1() throws IOException {
