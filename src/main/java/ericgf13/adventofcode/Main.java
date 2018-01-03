@@ -886,22 +886,20 @@ public class Main {
 
 		int steps = 343;
 		int pos = 0;
-		int val = 0;
 
-		for (int i = 0; i < 2017; i++) {
+		for (int i = 1; i <= 2017; i++) {
 			pos = (pos + steps) % buffer.size() + 1;
-			buffer.add(pos, ++val);
+			buffer.add(pos, i);
 		}
 
 		int pos2 = 0;
-		int length = 0;
 		int result = 0;
 
-		for (int i = 0; i < 50_000_000; i++) {
-			pos2 = (pos2 + steps) % ++length + 1;
+		for (int i = 1; i <= 50_000_000; i++) {
+			pos2 = (pos2 + steps) % i + 1;
 
 			if (pos2 == 1) {
-				result = i + 1;
+				result = i;
 			}
 		}
 
