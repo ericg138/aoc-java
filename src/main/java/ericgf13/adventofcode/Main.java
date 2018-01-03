@@ -881,11 +881,10 @@ public class Main {
 	private static void day17() {
 		System.out.println("===== DAY 17 =====");
 
-		int steps = 343;
-
 		List<Integer> buffer = new ArrayList<>();
 		buffer.add(0);
 
+		int steps = 343;
 		int pos = 0;
 		int val = 0;
 
@@ -894,7 +893,19 @@ public class Main {
 			buffer.add(pos, ++val);
 		}
 
-		System.out.println(buffer.get(pos + 1));
+		int pos2 = 0;
+		int length = 0;
+		int result = 0;
+
+		for (int i = 0; i < 50_000_000; i++) {
+			pos2 = (pos2 + steps) % ++length + 1;
+
+			if (pos2 == 1) {
+				result = i + 1;
+			}
+		}
+
+		System.out.println("part1=" + buffer.get(pos + 1) + " part2=" + result);
 	}
 
 	private static void day18part1() throws IOException {
