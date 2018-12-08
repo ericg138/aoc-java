@@ -7,7 +7,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import ericgf13.adventofcode.Main;
+import ericgf13.adventofcode.MainOld;
 
 public class Program implements Runnable {
 
@@ -48,23 +48,23 @@ public class Program implements Runnable {
 			switch (splitInstruction[0]) {
 			case "snd":
 				try {
-					queueOut.put(Main.getValue(x, values));
+					queueOut.put(MainOld.getValue(x, values));
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
 				sendCount++;
 				break;
 			case "set":
-				values.put(x, Main.getValue(y, values));
+				values.put(x, MainOld.getValue(y, values));
 				break;
 			case "add":
-				values.put(x, Main.getValue(x, values) + Main.getValue(y, values));
+				values.put(x, MainOld.getValue(x, values) + MainOld.getValue(y, values));
 				break;
 			case "mul":
-				values.put(x, Main.getValue(x, values) * Main.getValue(y, values));
+				values.put(x, MainOld.getValue(x, values) * MainOld.getValue(y, values));
 				break;
 			case "mod":
-				values.put(x, Main.getValue(x, values) % Main.getValue(y, values));
+				values.put(x, MainOld.getValue(x, values) % MainOld.getValue(y, values));
 				break;
 			case "rcv":
 				try {
@@ -80,8 +80,8 @@ public class Program implements Runnable {
 				}
 				break;
 			case "jgz":
-				if (Main.getValue(x, values) > 0) {
-					i += Main.getValue(y, values) - 1;
+				if (MainOld.getValue(x, values) > 0) {
+					i += MainOld.getValue(y, values) - 1;
 				}
 				break;
 			}

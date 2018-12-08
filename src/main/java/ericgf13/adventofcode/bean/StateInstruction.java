@@ -1,6 +1,6 @@
 package ericgf13.adventofcode.bean;
 
-import ericgf13.adventofcode.Main.Direction;
+import ericgf13.adventofcode.MainOld.Direction;
 
 public class StateInstruction {
 
