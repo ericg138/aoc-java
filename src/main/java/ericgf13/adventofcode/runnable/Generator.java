@@ -4,7 +4,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class Generator implements Runnable {
 
-	private static int DIVISOR = 2147483647;
+	private static final int DIVISOR = 2147483647;
 	private boolean running = true;
 	private long value;
 	private int factor;
@@ -27,6 +27,7 @@ public class Generator implements Runnable {
 					queue.put(value);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+					Thread.currentThread().interrupt();
 				}
 			}
 		}

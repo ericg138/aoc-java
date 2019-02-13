@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Day10 extends Day {
     public Day10() {
@@ -19,10 +20,7 @@ public class Day10 extends Day {
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
 
-        List<Integer> list = new ArrayList<>();
-        for (int i = 0; i < 256; i++) {
-            list.add(i);
-        }
+        List<Integer> list = IntStream.range(0, 256).boxed().collect(Collectors.toList());
 
         int pos = 0;
         int skipSize = 0;
@@ -48,19 +46,20 @@ public class Day10 extends Day {
 
     @Override
     public String part2() {
-        List<Integer> input = getInputAsString().chars().boxed().collect(Collectors.toList());
-        input.addAll(Arrays.asList(17, 31, 73, 47, 23));
+        return knotHash(getInputAsString());
+    }
 
-        List<Integer> list = new ArrayList<>();
-        for (int i = 0; i < 256; i++) {
-            list.add(i);
-        }
+    public static String knotHash(String input) {
+        List<Integer> inputChars = input.chars().boxed().collect(Collectors.toList());
+        inputChars.addAll(Arrays.asList(17, 31, 73, 47, 23));
+
+        List<Integer> list = IntStream.range(0, 256).boxed().collect(Collectors.toList());
 
         int pos = 0;
         int skipSize = 0;
 
         for (int y = 0; y < 64; y++) {
-            for (int length : input) {
+            for (int length : inputChars) {
 
                 List<Integer> subList = new ArrayList<>();
                 for (int i = 0; i < length; i++) {

@@ -7,13 +7,13 @@ public class Day03 extends Day {
         super(3);
     }
 
-    private int input = 368078;
+    private static final int INPUT = 368078;
 
     @Override
     public String part1() {
         int steps = 0;
 
-        int square = (int) Math.ceil(Math.sqrt(input));
+        int square = (int) Math.ceil(Math.sqrt(INPUT));
         if (square % 2 == 0) {
             square++;
         }
@@ -25,17 +25,17 @@ public class Day03 extends Day {
         int topRightValue = topLeftValue - square + 1;
 
         int topValue;
-        if (bottomLeftValue < input) {
+        if (bottomLeftValue < INPUT) {
             topValue = bottomRightValue;
-        } else if (topLeftValue < input) {
+        } else if (topLeftValue < INPUT) {
             topValue = bottomLeftValue;
-        } else if (topRightValue < input) {
+        } else if (topRightValue < INPUT) {
             topValue = topLeftValue;
         } else {
             topValue = topRightValue;
         }
 
-        int delta = topValue - input;
+        int delta = topValue - INPUT;
 
         if (delta > offset) {
             steps += delta - offset;

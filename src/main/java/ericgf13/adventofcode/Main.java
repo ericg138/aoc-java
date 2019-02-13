@@ -19,6 +19,11 @@ public class Main {
         days.add(new Day08());
         days.add(new Day09());
         days.add(new Day10());
+        days.add(new Day11());
+        days.add(new Day12());
+        days.add(new Day13());
+        days.add(new Day14());
+        days.add(new Day15());
 
         days.forEach(day -> {
             System.out.println("===== DAY " + day.getDayNum() + " =====");
