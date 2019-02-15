@@ -40,8 +40,8 @@ public class Day15 extends Day {
         BlockingQueue<Long> queueA = new LinkedBlockingQueue<>();
         BlockingQueue<Long> queueB = new LinkedBlockingQueue<>();
 
-        Generator generatorA = new Generator(679, A_FACTOR, 4, queueA);
-        Generator generatorB = new Generator(771, B_FACTOR, 8, queueB);
+        Generator generatorA = new Generator(A_START, A_FACTOR, 4, queueA);
+        Generator generatorB = new Generator(B_START, B_FACTOR, 8, queueB);
 
         new Thread(generatorA).start();
         new Thread(generatorB).start();
