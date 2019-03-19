@@ -1,7 +1,7 @@
 package ericgf13.adventofcode.days;
 
 import ericgf13.adventofcode.Day;
-import ericgf13.adventofcode.bean.Disk;
+import ericgf13.adventofcode.beans.Disk;
 
 import java.util.Arrays;
 import java.util.HashSet;

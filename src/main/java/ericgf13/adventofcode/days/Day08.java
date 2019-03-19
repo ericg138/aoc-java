@@ -1,8 +1,8 @@
 package ericgf13.adventofcode.days;
 
 import ericgf13.adventofcode.Day;
-import ericgf13.adventofcode.bean.Condition;
-import ericgf13.adventofcode.bean.Instruction;
+import ericgf13.adventofcode.beans.Condition;
+import ericgf13.adventofcode.beans.Instruction;
 
 import java.util.*;
 

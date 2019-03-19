@@ -1,7 +1,7 @@
 package ericgf13.adventofcode.days;
 
 import ericgf13.adventofcode.Day;
-import ericgf13.adventofcode.runnable.Generator;
+import ericgf13.adventofcode.runnables.Generator;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

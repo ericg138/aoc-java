@@ -1,8 +1,8 @@
 package ericgf13.adventofcode;
 
-import ericgf13.adventofcode.bean.*;
-import ericgf13.adventofcode.runnable.Generator;
-import ericgf13.adventofcode.runnable.Program;
+import ericgf13.adventofcode.beans.*;
+import ericgf13.adventofcode.runnables.Generator;
+import ericgf13.adventofcode.runnables.Program;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.BufferedReader;
@@ -1430,7 +1430,7 @@ public class MainOld {
 			bridges.add(bridge);
 		} else {
 			for (Component c : componentsCompatiblePort) {
-				Bridge b = bridge.clone();
+				Bridge b = new Bridge(bridge);
 				b.getComponents().add(c);
 				buildBridges(c.getOtherPort(port), components, b, bridges);
 			}
