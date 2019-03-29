@@ -16,8 +16,8 @@ public class Day07 extends Day {
         super(7);
 
         for (String line : getInputAsList()) {
-            String name = line.substring(0, line.indexOf(" "));
-            String weight = line.substring(line.indexOf("(") + 1, line.indexOf(")"));
+            String name = line.substring(0, line.indexOf(' '));
+            String weight = line.substring(line.indexOf('(') + 1, line.indexOf(')'));
             Disk disk = new Disk(name, Integer.parseInt(weight));
             if (line.contains("->")) {
                 String childrenStr = line.substring(line.indexOf("->") + 3).replace(" ", "");
@@ -71,10 +71,8 @@ public class Day07 extends Day {
             int childTrueWeight = calculateTrueWeight(child);
             trueWeight += childTrueWeight;
 
-            if (previousChildTrueWeight != -1 && previousChildTrueWeight != childTrueWeight) {
-                if (badDiskParent == null) {
-                    badDiskParent = disk;
-                }
+            if (previousChildTrueWeight != -1 && previousChildTrueWeight != childTrueWeight && badDiskParent == null) {
+                badDiskParent = disk;
             }
             previousChildTrueWeight = child.getTrueWeight();
         }
