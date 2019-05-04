@@ -7,7 +7,7 @@ public class Day03 extends Day {
         super(3);
     }
 
-    private static final int INPUT = 368078;
+    private static final int INPUT = 265149;
 
     @Override
     public String part1() {

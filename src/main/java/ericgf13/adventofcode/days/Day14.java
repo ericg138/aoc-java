@@ -12,7 +12,7 @@ public class Day14 extends Day {
         super(14);
     }
 
-    private static final String INPUT = "hxtvlmkl";
+    private static final String INPUT = "vbqugkhl";
 
     @Override
     public String part1() {

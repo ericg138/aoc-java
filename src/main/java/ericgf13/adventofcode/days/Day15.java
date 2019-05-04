@@ -11,8 +11,8 @@ public class Day15 extends Day {
         super(15);
     }
 
-    private static final int A_START = 679;
-    private static final int B_START = 771;
+    private static final int A_START = 783;
+    private static final int B_START = 325;
     private static final int A_FACTOR = 16807;
     private static final int B_FACTOR = 48271;
     private static final int DIVISOR = 2147483647;

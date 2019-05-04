@@ -10,7 +10,7 @@ public class Day17 extends Day {
         super(17);
     }
 
-    private int input = 343;
+    private int input = 335;
 
     @Override
     public String part1() {
