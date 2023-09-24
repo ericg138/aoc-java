@@ -1,2 +1,2 @@
-# adventofcode-2017
+# aoc-java
 https://adventofcode.com/2017
