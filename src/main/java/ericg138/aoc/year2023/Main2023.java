@@ -4,6 +4,7 @@ import ericg138.aoc.Day;
 import ericg138.aoc.year2023.days.Day01;
 import ericg138.aoc.year2023.days.Day02;
 import ericg138.aoc.year2023.days.Day03;
+import ericg138.aoc.year2023.days.Day04;
 import java.util.List;
 
 public class Main2023 {
@@ -12,7 +13,8 @@ public class Main2023 {
     List.of(
       new Day01(),
       new Day02(),
-      new Day03()
+      new Day03(),
+      new Day04()
     ).forEach(Day::execute);
   }
 }
