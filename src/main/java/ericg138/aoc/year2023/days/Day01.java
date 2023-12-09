@@ -1,5 +1,6 @@
 package ericg138.aoc.year2023.days;
 
+import com.google.common.collect.Iterables;
 import ericg138.aoc.Day;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class Day01 extends Day {
     int result = 0;
     for (String line : input) {
       List<String> numList = Stream.of(line.split("")).filter(StringUtils::isNumeric).toList();
-      result += Integer.parseInt(numList.get(0) + numList.get(numList.size() - 1));
+      result += Integer.parseInt(numList.get(0) + Iterables.getLast(numList));
     }
     return "" + result;
   }
