@@ -14,7 +14,7 @@ public class Day02 extends Day {
 
   @Override
   public String part1() {
-    int result = 0;
+    long result = 0;
 
     for (String report : input) {
       List<Integer> levels = Arrays.stream(report.split(" ")).mapToInt(Integer::parseInt).boxed().toList();

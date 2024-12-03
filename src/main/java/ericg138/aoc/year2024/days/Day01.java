@@ -14,7 +14,7 @@ public class Day01 extends Day {
 
   @Override
   public String part1() {
-    int result = 0;
+    long result = 0;
 
     var list1 = new ArrayList<Integer>();
     var list2 = new ArrayList<Integer>();
